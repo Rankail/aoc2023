@@ -2,11 +2,13 @@ import subprocess
 import webbrowser
 import os
 
+path = os.path.dirname(os.path.realpath(__file__))
+
 day = int(input("Day: "))
 if 25 < day or 0 > day:
     print("invalid day")
     exit()
-p = f"E:/dev/AdventOfCode/aoc2023/{day:02}"
+p = f"{path}/{day:02}"
 if not os.path.isdir(p):
     os.mkdir(p)
     open(p+"/i.txt", "x")
@@ -16,5 +18,5 @@ if not os.path.isdir(p):
     open(p+"/2.py", "x")
 
 webbrowser.open("https://adventofcode.com/")
-subprocess.Popen(["code", "E:/dev/AdventOfCode/aoc2023"], shell=True)
+subprocess.Popen(["code", path], shell=True)
 quit()
