@@ -21,6 +21,7 @@ std::string trim(std::string s);
 Splits the string at the delimiter and returns a vector of trimmed strings.
 */
 std::vector<std::string> split(const std::string& s, const std::string& delim);
+std::pair<std::string, std::string> splitOnce(const std::string& s, const std::string& delim);
 
 std::string padLeft(const std::string& s, int len);
 std::string padRight(const std::string& s, int len);

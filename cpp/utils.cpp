@@ -53,34 +53,15 @@ std::vector<std::string> split(const std::string& s, const std::string& delim) {
     return parts;
 }
 
-/*std::vector<std::string> split(const std::string& s, char delim) {
-    if (trim(s).empty()) {
-        return {};
+std::pair<std::string, std::string> splitOnce(const std::string& s, const std::string& delim) {
+    auto idx = s.find(delim);
+    if (idx == std::string::npos) {
+        std::cerr << '"' << s << "\" cant be split at non-existent \"" << delim << '"' << std::endl;
+        throw std::runtime_error("Nothin to split at");
     }
 
-    size_t lastDelim = 0;
-    std::vector<std::string> parts{};
-    while (true) {
-        auto curDelim = s.find(delim, lastDelim);
-        std::string part;
-
-        if (curDelim == std::string::npos) {
-            part = s.substr(lastDelim);
-        } else {
-            part = s.substr(lastDelim, curDelim - lastDelim);
-        }
-        part = trim(part);
-
-        parts.emplace_back(part);
-        lastDelim = curDelim;
-
-        if (curDelim == std::string::npos) {
-            return parts;
-        }
-
-        lastDelim = curDelim + 1;
-    }
-}*/
+    return {s.substr(0, idx), s.substr(idx + delim.size())};
+}
 
 std::string padLeft(const std::string& s, int len) {
     return std::string(std::max(len - s.length(), 0ull), ' ') + s;
