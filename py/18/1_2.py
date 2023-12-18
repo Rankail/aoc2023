@@ -111,15 +111,15 @@ def parseDigger(lines: list[str]):
     curPos = (0,0)
     ranges = []
     splits = set()
+
     circ = 0
+
     for line in lines:
-        _, _, color = line.split(" ")
-        color = color[2:-1]
-        dirIdx = int(color[-1])
-        length = int(color[:-1], 16)
+        dirChar, length, _ = line.split(" ")
+        length = int(length)
         circ += length
         
-        dx, dy = getDirOfIdx(dirIdx)
+        dx, dy = getDirOfChar(dirChar)
         if dx == 0:
             splits.add(curPos[0])
         elif dy == 0:
