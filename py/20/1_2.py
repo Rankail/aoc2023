@@ -57,20 +57,19 @@ def parse():
 
 def pressButton(q: deque[str]):
     global memories, switches, destinations, modules
-
-    count = 0
+    low = 1
+    high = 0
 
     while q:
         source, pulseIn, target = q.popleft()
-
-        if pulseIn and target == "rx":
-            count += 1
 
         if target not in modules: continue
 
         moduleName, moduleType = modules[target]
 
         pulseOut = False
+
+
 
         if moduleType == '':
             pulseOut = pulseIn
@@ -83,11 +82,16 @@ def pressButton(q: deque[str]):
             memories[moduleName][source] = pulseIn
             pulseOut = not all(m for m in memories[moduleName].values())
 
+        if pulseOut:
+            high += len(destinations[moduleName])
+        else:
+            low += len(destinations[moduleName])
+
         for d in destinations[moduleName]:
             # print(f"{target} {'high' if pulse else 'low'} -> {d}")
             q.append((moduleName, pulseOut, d))
 
-    return count == 1
+    return low, high
 
 @profiler
 def solve():
@@ -96,16 +100,19 @@ def solve():
     q: deque[tuple[bool, str]] = deque()
     q.append(("", False, "broadcaster"))
 
-    count = 0
+    #count = 0
     low = 0
     high = 0
     
-    i = 1
-    while True:
-        if i % 10000 == 0:
-            print(i)
-        if pressButton(q.copy()):
-            return i
-        i += 1
+    for _ in range(1000):
+        nl, nh = pressButton(q.copy())
+        low += nl
+        high += nh
+        print(high, low)
+        print()
+
+    print(high, low)
+
+    return high * low
 
 print(solve())

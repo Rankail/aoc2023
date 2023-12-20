@@ -55,7 +55,20 @@ def parse():
                 memories[d] = dict()
             memories[d][name] = False
 
-def pressButton(q: deque[str]):
+    with open("graph.txt", "w") as f:
+        for (moduleName, moduleType) in modules.values():
+            f.write(moduleType + moduleName+ "\n")
+        
+        for moduleName, dests in destinations.items():
+            mm = modules[moduleName]
+            for d in dests:
+                if d in modules:
+                    dm = modules[d]
+                    f.write(mm[1] + mm[0]+" "+dm[1] + dm[0]+"\n")
+                else:
+                    f.write(mm[1] + mm[0]+" "+d+"\n")
+
+def pressButton(idx: int, q: deque[str]):
     global memories, switches, destinations, modules
 
     count = 0
@@ -63,8 +76,8 @@ def pressButton(q: deque[str]):
     while q:
         source, pulseIn, target = q.popleft()
 
-        if pulseIn and target == "rx":
-            count += 1
+        if not pulseIn and target in ["dc", "rv", "cq", "vp"]:
+            print(target, idx)
 
         if target not in modules: continue
 
@@ -87,6 +100,7 @@ def pressButton(q: deque[str]):
             # print(f"{target} {'high' if pulse else 'low'} -> {d}")
             q.append((moduleName, pulseOut, d))
 
+    # print(count)
     return count == 1
 
 @profiler
@@ -100,12 +114,19 @@ def solve():
     low = 0
     high = 0
     
-    i = 1
+    i = 0
     while True:
-        if i % 10000 == 0:
-            print(i)
-        if pressButton(q.copy()):
+        if pressButton(i, q.copy()):
             return i
         i += 1
 
 print(solve())
+
+# dc 3796
+# vp 3846
+# cq 3876
+# rv 4050
+# dc 7593
+# vp 7693
+# cq 7753
+# rv 8101
