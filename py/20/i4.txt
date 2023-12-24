@@ -1,4 +1,0 @@
-broadcaster -> a
-%a -> b, c
-%b -> c
-&c -> output
