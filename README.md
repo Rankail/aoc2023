@@ -1,16 +1,6 @@
 # Advent of Code 2023
 
-You know the drill:
-
-Languages i want to use this year:
-- C++
-- Python
-
-Languages i may add later:
-- APL
-- Sphinx
-- Rust
-
+You know the drill ...
 
 ## Some more
 
