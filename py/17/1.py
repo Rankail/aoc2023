@@ -37,30 +37,31 @@ def dijkstra(m: list[list[int]]) -> int: # accum heat
     visited: set[tuple[int, int, int]] = set()
     
     h = []
-    heappush(h, (0, 0, 0, 0, 10)) # heat, x, y, n, dir
+    heappush(h, (0, 0, 0, 0, 4)) # heat, x, y, n, dir
 
     while len(h) != 0:
         heat, x, y, n, dir = heappop(h)
         if (x, y, n, dir) in visited: continue
         visited.add((x, y, n, dir))
-        if (x, y) == (width-1, height-1):
-            return heat
 
         for dx, dy, ndir in ((-1,0,0), (0,-1,1), (1,0,2), (0,1,3)):
-            if ndir == dir or (ndir + 2) % 4 == dir: continue # no reverse & all for that direction already covered
-            nheat = heat
+            nn = n+1 if ndir == dir else 1
+            if (ndir + 2) % 4 == dir: continue # no reverse & all for that direction already covered
+            if nn > 3: continue
+            nx = x + dx
+            ny = y + dy
+            if not (0 <= nx < width and 0 <= ny < height): continue # map bounds
 
-            for i in range(1, 4):
-                nx = x + dx * i
-                ny = y + dy * i
-                if not (0 <= nx < width and 0 <= ny < height): break # map bounds
-                nheat = m[ny][nx] + nheat
+            nheat = heat + m[ny][nx]
 
-                heappush(h, (nheat, nx,ny, i, ndir))
+            if (nx, ny) == (width-1, height-1):
+                return nheat
+
+            heappush(h, (nheat, nx,ny, nn, ndir))
 
     return -1
 
 m = parseInput(lines)
 heat = dijkstra(m)
 
-print(heat)
+print(heat) # 870

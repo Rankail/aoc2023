@@ -1,31 +1,71 @@
+import time
+
+def profiler(method):
+    def wrapper_method(*arg, **kw):
+        t = time.perf_counter()
+        ret = method(*arg, **kw)
+        print("Method " + method.__name__ + " took : " + "{:2.5f}".format(time.perf_counter() - t) + " sec")
+        return ret
+
+    return wrapper_method
+
 data = open("i.txt").read()
 lines = data.split("\n")
 
-def solve():
-    Factors, nextfactor, p1answer, p2answer, goalsteps, Pos, dirs = [0, 0, 0], 0, 0, 0, 26501365, {Startpos}, [(1, 0),(0, 1), (-1, 0) ,(0, -1)]
-    for count in range(1, 1000):
-        npos = set()
-        for r, c in Pos:
-            for dirn in dirs:
-                nr, nc = r + dirn[0], c + dirn[1]
-                if Grid[nr % Rows][nc % Cols] != "#":
-                    npos.add((nr, nc))
-        Pos = npos
-        if count == 64:
-            p1answer = len(Pos)
-        elif count % Rows == goalsteps % Rows:
-            Factors[nextfactor] = len(Pos)
-            nextfactor += 1
-            if nextfactor == 3:
-                delta0, delta1, delta2 = Factors[0], Factors[1] - Factors[0], Factors[2] - 2 * Factors[1] + Factors[0]
-                p2answer = delta0 + delta1 * (goalsteps // Rows) + delta2 * ((goalsteps // Rows) * ((goalsteps // Rows) - 1) // 2)
-                return p1answer, p2answer
+w = len(lines[0])
+h = len(lines)
 
-Grid = [[char for char in line] for line in lines]
-Rows, Cols, Startpos = len(Grid), len(Grid[0]), (0, 0)
-for row in range(Rows):
-    col = lines[row].rfind('S')
-    if col > -1:
-        Startpos = (row, col)
-        Grid[row][col] = '.'
+def bfsParity(visited: set[tuple[int, int]], latest: set[tuple[int, int]]):
+    newFound: set[tuple[int, int]] = set()
+
+    for x, y in latest:
+        for dx, dy in ((-1, 0), (0,-1), (1,0), (0,1)):
+            nx = x + dx
+            ny = y + dy
+            if (nx, ny) in visited: continue
+            if lines[ny % h][nx % w] == "#": continue
+
+            newFound.add((nx, ny))
+            visited.add((nx, ny))
+
+    return visited, newFound
+
+def calcQuadratic(factors, x):
+    d0, d1, d2 = factors[0], factors[1] - factors[0], factors[2] - 2 * factors[1] + factors[0]
+    return d0 + d1 * x + d2 * (x * (x - 1) // 2)
+
+@profiler
+def solve():
+    factors = []
+    p1answer = 0
+    goalsteps = 26501365
+
+    start = None
+    for (y, line) in enumerate(lines):
+        sIdx = line.find('S')
+        if sIdx != -1:
+            start = (sIdx, y)
+            break
+
+    visited = {start}
+    newNodes = {start}
+
+    counts = [0, 1]
+    state = 0
+
+    count = 1
+    while True:
+        visited, newNodes = bfsParity(visited, newNodes)
+        counts[state] += len(newNodes)
+
+        if count == 64:
+            p1answer = counts[state]
+        elif count % w == goalsteps % w:
+            factors.append(counts[state])
+            if len(factors) >= 3:
+                return p1answer, calcQuadratic(factors, goalsteps // w)
+
+        state = (state+1) % 2
+        count += 1
+
 print(solve())

@@ -1,5 +1,15 @@
 from collections import deque
 import copy
+import time
+
+def profiler(method):
+    def wrapper_method(*arg, **kw):
+        t = time.perf_counter()
+        ret = method(*arg, **kw)
+        print("Method " + method.__name__ + " took : " + "{:2.5f}".format(time.perf_counter() - t) + " sec")
+        return ret
+
+    return wrapper_method
 
 data = open("i.txt").read()
 lines = data.split("\n")
@@ -128,6 +138,7 @@ def createInitialRanges():
         "s": Range(1, 4000)
     }
 
+@profiler
 def solve():
     ws, _ = parseData()
 
